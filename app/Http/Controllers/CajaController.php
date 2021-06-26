@@ -18,6 +18,18 @@ class CajaController extends Controller
             'cantidad' => $request->cantidad,
         ]);
 
-       return response()->json($caja, 201);;
+       return response()->json($caja, 201);
+    }
+
+    public function truncate()
+    {
+        
+
+        Caja::truncate();
+        $response = array(
+            "mensaje" => "La caja se ha vaciado."
+        );
+
+       return response()->json($response, 201);
     }
 }

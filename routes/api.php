@@ -16,3 +16,5 @@ use App\Http\Controllers\CajaController;
 */
 
 Route::post('carga', [CajaController::class, 'store']);
+
+Route::delete('vaciar', [CajaController::class, 'truncate']);
