@@ -15,6 +15,8 @@ class CreateCajasTable extends Migration
     {
         Schema::create('cajas', function (Blueprint $table) {
             $table->id();
+            $table->integer('denominacion');
+            $table->integer('cantidad');
             $table->timestamps();
         });
     }

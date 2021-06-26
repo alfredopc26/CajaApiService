@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CajaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post(uri:'/reset', action: 'ResetController@reset');
-
-Route::post(uri: '/carga', action: 'ResetController@store');
+Route::post('carga', [CajaController::class, 'store']);

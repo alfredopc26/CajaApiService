@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Caja extends Model
 {
-    use HasFactory;
+    protected $fillable = [
+        'denominacion',
+        'cantidad',
+    ];
 }
