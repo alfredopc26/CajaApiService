@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Caja;
+use App\Models\StatusCaja;
 
 class CajaController extends Controller
 {
@@ -17,6 +18,14 @@ class CajaController extends Controller
             'denominacion' => $request->denominacion,
             'cantidad' => $request->cantidad,
         ]);
+
+       return response()->json($caja, 201);
+    }
+
+    public function show(Request $request)
+    {
+        
+       $caja = StatusCaja::all();
 
        return response()->json($caja, 201);
     }
