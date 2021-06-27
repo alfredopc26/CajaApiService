@@ -19,4 +19,6 @@ Route::post('carga', [CajaController::class, 'store']);
 
 Route::get('estado', [CajaController::class, 'show']);
 
+Route::put('pagar', [CajaController::class, 'pago']);
+
 Route::delete('vaciar', [CajaController::class, 'truncate']);
