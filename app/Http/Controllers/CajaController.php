@@ -51,10 +51,10 @@ class CajaController extends Controller
     {
         foreach($request->denominacion as $denominacion){
             if(!CajaController::validarDenominacion($denominacion)){
-                $response = ["mensaje" => "La denominación $denominacion no es válida."];
-                $data = LogsController::prepare('Failed', $response['mensaje']);
+                $response = ["message" => "La denominación no es válida.", "error" => $denominacion ];
+                $data = LogsController::prepare('Failed', $response['message']." DEN: ".$response['error']);
                 LogsController::save($data);
-                return $response;
+                return response()->json($data, 400);
             }
         }
 
@@ -66,7 +66,7 @@ class CajaController extends Controller
             $data = LogsController::prepare('Failed', $response['mensaje']);
             LogsController::save($data);
 
-           return response()->json($response, 400);
+           return response()->json($data, 400);
        };
 
        if($cambio > 0){
@@ -75,7 +75,7 @@ class CajaController extends Controller
             $response = ["mensaje" => "No hay cambio para la denominación ingresada."];
             $data = LogsController::prepare('Failed', $response['mensaje']);
             LogsController::save($data);
-           return response()->json($response, 400);
+           return response()->json($data, 400);
        }
 
        $validarDenominacion = CambioController::validarDenominacion(StatusCaja::all(), $cambio);
@@ -84,14 +84,19 @@ class CajaController extends Controller
             $response = ["mensaje" => "No hay cambio para la denominación ingresada."];
             $data = LogsController::prepare('Failed', $response['mensaje']);
             LogsController::save($data);
-            return response()->json($response, 400);
+            return response()->json($data, 400);
         }
 
         $result = CambioController::updateDenominacion($validarDenominacion);
+        if(is_array($validarDenominacion)){
+           $cambio = implode(',',$validarDenominacion);
+        }
+
+        $request->monto = $request->monto." Cambio: ".$cambio;
        }
 
-
         foreach($request->denominacion as $den){
+
             $result = Caja::create([
                 'denominacion' => $den,
                 'cantidad' => 1
@@ -101,7 +106,10 @@ class CajaController extends Controller
             LogsController::save($data);
         }
 
-       return response()->json($result, 200);
+        $data = LogsController::prepare('Pagar', $request->monto );
+        LogsController::save($data);
+
+       return response()->json($data, 200);
     }
 
     public function truncate()

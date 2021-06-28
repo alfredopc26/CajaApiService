@@ -8,7 +8,11 @@ use App\Http\Controllers\LogsController;
 
 class CambioController extends Controller
 {
-    
+    /** 
+     * Validar si hay cambio para entregar o no hay.
+     * @return boolean
+     * 
+    */
     public static function validarCambio($caja, $cambio)
     {
         
@@ -25,6 +29,13 @@ class CambioController extends Controller
        return true;
     }
 
+    /** 
+     * Validar si dentro de las denominaciones se puede entregar el cambio.
+     * 
+     * @return array|int
+     * 
+     * 
+    */
     public static function validarDenominacion($caja, $cambio)
     {
         $sumDenominacion = 0;
@@ -37,11 +48,13 @@ class CambioController extends Controller
             if($registro->denominacion < $cambio){
                 for($i = 1; $i <= $registro->total; $i++ ){
 
-                    if(CambioController::calcularExceded($registro->denominacion, $i, $cambio)){
-                        break;
-                    }
                     $selectDenominacion[] = $registro->denominacion;
                     $sumDenominacion = array_sum($selectDenominacion);
+                    if($sumDenominacion > $cambio){
+                        array_pop($selectDenominacion);
+                        break;
+                    }
+
                     if( $sumDenominacion == $cambio){
                         return $selectDenominacion;
                     }
@@ -55,6 +68,12 @@ class CambioController extends Controller
        return false;
     }
 
+
+    /** 
+     * Actualiza las cantidades en la BD cuando se entrega un cambio
+     * @return void
+     * 
+    */
     public static function updateDenominacion($validacionDenominacion)
     {
         if(is_array($validacionDenominacion)){
@@ -69,17 +88,19 @@ class CambioController extends Controller
 
         }else{
             CambioController::quitarCambio($validacionDenominacion, 1);
-            $data = LogsController::prepare('Cambio', $validacionDenominacion);
+            $data = LogsController::prepare('Borrar', $validacionDenominacion);
         }
        
-        
-
 
         LogsController::save($data);
-
              
     }
 
+    /** 
+     * Calcula valor excedente de la cantidad a cambiar
+     * @return boolean
+     * 
+    */
     private static function calcularExceded($denominacion, $cantidad, $cambio, $selectDenominacion = 0)
     {
         $exceded = false;
@@ -93,6 +114,11 @@ class CambioController extends Controller
         return $exceded;
     }
 
+    /** 
+     * Elimina los registros con denominaciones cuando estas ya no tienen cantidades
+     * @return void
+     * 
+    */
     private static function quitarCambio($denominacion, $cantidad)
     {
 
@@ -122,7 +148,6 @@ class CambioController extends Controller
 
         $data = LogsController::prepare('Borrar', $denominacion->id);
         LogsController::save($data);
-        return $query;
     }
 
 }
