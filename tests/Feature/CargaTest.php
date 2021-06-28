@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Faker\Factory as Faker;
 
 class CargaTest extends TestCase
 {
@@ -65,4 +66,34 @@ class CargaTest extends TestCase
                 'referencia' => "La cantidad no es válida. CANT: ".$payload['cantidad']
             ]);
         }
+
+    /* comprobación automatica de datos a cargar*/
+    /** @test */
+    public function carga_cantidades_random()
+    {
+
+        $faker = Faker::create();
+
+        for ($i=1; $i < 50; $i++) {
+
+            $payload = [
+                'denominacion' => $faker->randomElement(['50', '100', '200', '500', '1000', '5000', '10000', '20000', '50000', '100000']),
+                'cantidad'  => $i
+            ];
+            $this->json('post', '/api/carga', $payload)
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'accion',
+                'detalle',
+                'referencia' => [
+                        'denominacion',
+                        'cantidad',
+                        'updated_at',
+                        'created_at',
+                        'id'
+                 ]
+                ]);
+        }
+
+    }
 }
