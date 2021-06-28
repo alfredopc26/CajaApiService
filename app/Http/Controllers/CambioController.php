@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Caja;
+use App\Http\Controllers\LogsController;
 
 class CambioController extends Controller
 {
@@ -63,16 +64,18 @@ class CambioController extends Controller
             foreach($unicoValor as $denominacion){
 
                 CambioController::quitarCambio($denominacion, $contar[$denominacion]);
-               
+                $data = LogsController::prepare('Cambio', $contar[$denominacion] * $denominacion);
             }
 
         }else{
             CambioController::quitarCambio($validacionDenominacion, 1);
+            $data = LogsController::prepare('Cambio', $validacionDenominacion);
         }
        
         
 
-        
+
+        LogsController::save($data);
 
              
     }
@@ -90,7 +93,8 @@ class CambioController extends Controller
         return $exceded;
     }
 
-    private static function quitarCambio($denominacion, $cantidad){
+    private static function quitarCambio($denominacion, $cantidad)
+    {
 
         $denominacion = Caja::where('denominacion', $denominacion )->first();
         $calculo = $denominacion->cantidad - $cantidad;
@@ -98,6 +102,8 @@ class CambioController extends Controller
             $query = Caja::where('id', $denominacion->id )
                    ->update(['cantidad' => $calculo ]);
 
+            $data = LogsController::prepare('Actualizar', $denominacion->id);
+            LogsController::save($data);
             return $query;
         }
 
@@ -105,6 +111,8 @@ class CambioController extends Controller
 
             $query = Caja::where('id', $denominacion->id )
                 ->delete();
+            $data = LogsController::prepare('Borrar', $denominacion->id);
+            LogsController::save($data);
             CambioController::updateDenominacion($denominacion, abs($calculo));
             
         }
@@ -112,6 +120,8 @@ class CambioController extends Controller
         $query = Caja::where('id', $denominacion->id )
                 ->delete();
 
+        $data = LogsController::prepare('Borrar', $denominacion->id);
+        LogsController::save($data);
         return $query;
     }
 

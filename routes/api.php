@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\LogsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,8 @@ use App\Http\Controllers\CajaController;
 Route::post('carga', [CajaController::class, 'store']);
 
 Route::get('estado', [CajaController::class, 'show']);
+
+Route::get('logs', [LogsController::class, 'show']);
 
 Route::put('pagar', [CajaController::class, 'pago']);
 
