@@ -14,10 +14,17 @@ class CajaController extends Controller
     public function store(Request $request)
     {
         if(!CajaController::validarDenominacion($request->denominacion)){
-            $response = ["mensaje" => "La denominación $request->denominacion no es válida."];
-            $data = LogsController::prepare('Failed', $response['mensaje']);
+            $response = ["message" => "La denominación no es válida.", "error" => $request->denominacion ];
+            $data = LogsController::prepare('Failed', $response['message']." DEN: ".$response['error']);
             LogsController::save($data);
-            return $response;
+            return response()->json($data, 400);
+        }
+
+        if($request->cantidad <= 0 || !is_int($request->cantidad)){
+            $response = ["message" => "La cantidad no es válida.", "error" => $request->cantidad ];
+            $data = LogsController::prepare('Failed', $response['message']." CANT: ".$response['error']);
+            LogsController::save($data);
+            return response()->json($data, 400);
         }
         $caja = Caja::create
         ([
@@ -28,7 +35,7 @@ class CajaController extends Controller
         $data = LogsController::prepare('Cargar', $caja);
         LogsController::save($data);
 
-        return response()->json($caja, 200);
+        return response()->json($data, 200);
     }
 
     public function show(Request $request)
